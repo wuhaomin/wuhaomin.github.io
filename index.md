@@ -34,7 +34,7 @@ For more details see [GitHub Flavored Markdown](https://guides.github.com/featur
  - react
   
   - [demo连接](https://github.com/wuhaomin/wuhaomin.github.io/blob/master/react/note.md)
-  - [图片测试]（https://www.baidu.com/img/bd_logo1.png）
+  - [图片测试]（https://www.baidu.com/img/bd_logo1.png)
  
  - react-router
  
