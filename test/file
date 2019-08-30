@@ -294,3 +294,301 @@ class Mqtt {
 }
 
 export default Mqtt;
+
+
+
+
+
+
+
+import mqtt from 'mqtt';
+class MQTTBasic {
+  status = 0;
+  statusChangeListeners = [];
+  messageListeners = [];
+  subscriptions = [];
+  /**
+  * @param {object} data 初始化所需参数
+  * @param {string} data.userName MQTT连接用户名
+  * @param {string} data.password MQTT连接密码
+  * @param {string} data.clientId MQTT连接所需client id
+  */
+  init({ userName, topic, message, passWord, ...rest }) {
+    this.options = {
+      ...rest,
+      username: userName,
+      password: passWord,
+      will: {
+        topic,
+        payload: JSON.stringify(message),
+        qos: 1
+      }
+    }
+
+    return Promise.resolve();
+  }
+
+
+  /**
+  * mqtt订阅
+  * @param {object} topic 订阅主题
+  */
+  subscribe({ topic }) {
+    if (this.client && this.client.connected) {
+      return new Promise(resolve => {
+        this.client.subscribe(topic, function (err) {
+          err ? resolve({ code: -1 }) : resolve({ code: 200 })
+        });
+      });
+    }
+
+    return new Promise(resolve => {
+      this.subscriptions.push({
+        topic,
+        cb: function (err) {
+          err ? resolve({ code: -1 }) : resolve({ code: 200 })
+        }
+      });
+    });
+  }
+
+  /**
+  * 取消mqtt订阅
+  * @param {object} topic 订阅主题
+  */
+  unsubscribe(topic) {
+    try {
+      this.client && this.client.unsubscribe(topic);
+    } catch (e) { }
+  }
+
+  /**
+  * 连接MQTT
+  * @param {object} data 连接所需参数
+  * @param {string} data.mqttIp MQTT连接IP
+  * @param {string} data.mqttPort MQTT连接端口
+  */
+  connect(data) {
+    this.mqttIp = data.mqttIp
+    this.mqttPort = data.mqttPort
+    this.client = mqtt.connect(
+      `${this.mqttIp}:${this.mqttPort}/mqtt`,
+      this.options
+    );
+    this.client.on('connect', () => {
+      if (this.status === 1) {
+        return;
+      }
+      this.status = 1;
+      this.statusChangeListeners.forEach(cb => {
+        typeof cb === 'function' && cb({ status: 1 });
+      })
+      this.subscriptions.forEach(({ topic, cb }) => {
+        this.client.subscribe(topic, cb)
+      });
+      this.client.on('message', (topic, message) => {
+        this.messageListeners.forEach(cb => {
+          typeof cb === 'function' && cb({
+            message: JSON.parse(message.toString()),
+            topic: topic
+          });
+        })
+      })
+    });
+
+  }
+
+  /**
+  * MQTT重连
+  */
+  reconnect() {
+    // this.client.reconnect();
+  }
+
+
+  /**
+  * @param {object} data 断开连接所需参数
+  */
+  disconnect(data) {
+
+    this.cancelAutoConnect();
+    this.client && this.client.end();
+  }
+
+  /**
+  * @param { Object } data 请求的数据
+  * @param { Number } timeout 超时时间
+  */
+  sendData({ data: { topic, message } }, timeout) {
+    this.client.publish(topic, JSON.stringify(message));
+    return new Promise((resolve) => {
+      ((reqTopic) => {
+        const callback = function (respTopic, message) {
+          if (reqTopic.substring(respTopic.lastIndexOf('\/')).replace('Req', '')
+            === respTopic.substring(respTopic.lastIndexOf('\/')).replace('Resp', '')) {
+            this.client && this.client.off('message', callback);
+            try {
+              resolve(JSON.parse(message.toString()));
+            } catch (e) { }
+          }
+        };
+        this.client.on('message', callback);
+      })(topic);
+    })
+  }
+
+
+  /**
+  * 监听mqtt连接成功事件
+  * @param cb {Function} 事件回调
+  */
+  onMQTTConnected(cb) {
+    this.statusChangeListeners.push(function (res) {
+      if (res.status === 1) {
+        cb();
+      }
+    })
+  }
+
+  /**
+  * 监听mqtt连接成功事件，只执行一次
+  * @param cb {Function} 事件回调
+  */
+  onceMQTTConnected(cb) {
+    this.statusChangeListeners.push(function (res) {
+      if (res.status === 1) {
+        cb();
+      }
+    })
+  }
+
+  /**
+  * 监听mqtt连接断开事件
+  * @param cb {Function} 事件回调
+  */
+  onMQTTDisconnected(cb) {
+    this.statusChangeListeners.push(function (res) {
+      if (res.status !== 1) {
+        cb();
+      }
+    })
+  }
+
+  /**
+  * 监听mqtt连接状态改变事件
+  * @param cb {Function} 事件回调
+  */
+  onMqttStatusChange(cb) {
+    this.statusChangeListeners.push(cb);
+  }
+
+  offMqttStatusChange(cb) {
+    delete this.statusChangeListeners[this.statusChangeListeners.indexOf(cb)];
+  }
+
+  /**
+  * 监听mqtt消息推送事件
+  * @param cb {Function} 事件回调
+  */
+  onMessageReceive(cb) {
+    this.messageListeners.push(cb);
+  }
+
+  /**
+  * 撤销监听mqtt消息推送事件
+  */
+  offMessageReceive(cb) {
+    if (cb) {
+      this.client && this.client.off('message', cb);
+      return;
+    }
+    this.messageListeners.forEach(cb => {
+      this.client && this.client.off('message', cb);
+    })
+    return this;
+  }
+
+  /**
+  * 自动重连
+  * @param {string} options.retry MQTT自动重连次数
+  * @param {string} options.delay 重连间隔基数(重连间隔 = 重连间隔基数 x 重连次数)
+  */
+  autoConnect(options = {}, callback) {
+    const tryTimes = options.retry || 100000;
+    let countDown = 1;
+    // 重练间隔基数
+    const defer = 5 * 1000;
+    const waitAndReconnect = () => {
+      if (this.status === 1) {
+        return;
+      }
+      clearTimeout(this.autoConnectTimer);
+      this.autoConnectTimer = setTimeout(() => this.reconnect(), defer);
+    }
+
+    this.handleAutoConnect = (res) => {
+      this.status = Number(res.status);
+      if (Number(res.status) === 1) {
+        clearTimeout(this.autoConnectTimer);
+        countDown = 0;
+      } else {
+        countDown += 1;
+        if (countDown <= tryTimes) {
+          waitAndReconnect();
+          if (typeof callback === 'function') {
+            callback(countDown);
+          }
+        }
+      }
+    };
+
+
+    this.client.connected && this.onMqttStatusChange(this.handleAutoConnect);
+    //网络恢复继续mqtt重连
+    this.afterNetworkRecover = (res) => {
+      if (Number(res.status) !== 1) {
+        this.reconnect();
+      }
+    }
+
+  }
+
+  cancelAutoConnect() {
+    clearTimeout(this.autoConnectTimer);
+  }
+
+  /**
+  * 监听MQTT连接被踢事件
+  * @param cb {Function} 事件回调
+  */
+  onForceQuit(cb) {
+    //暂时未实现
+  }
+
+  /**
+
+  * 取消监听MQTT连接被踢事件
+  * @param cb {Function} 事件回调
+  */
+  offForceQuit() {
+    //暂时未实现
+    return this;
+  }
+
+  destroy() {
+    this.offMessageReceive();
+    this.offMqttStatusChange();
+    this.offForceQuit();
+    this.cancelAutoConnect();
+    this.disconnect();
+  }
+
+  onAutoConnectFailed(cb) {
+    this.autoConnectFailed = cb;
+  }
+
+  autoConnectFailed() { }
+}
+
+export default MQTTBasic;
+
