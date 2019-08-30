@@ -28,6 +28,25 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
+
+## React
+
+ - react
+  
+  - [demo连接](https://github.com/wuhaomin/wuhaomin.github.io/blob/master/react/note.md)
+ 
+ - react-router
+ 
+ - react-redux
+ 
+
+## es6
+
+
+## css
+
+
+
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/wuhaomin/wuhaomin.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
@@ -38,18 +57,7 @@ Having trouble with Pages? Check out our [documentation](https://help.github.com
 
 
 ```javascript
-/* eslint-disable no-param-reassign */
-/*
- * @Author: linbin@leedarson.com
- * @Date: 2019-07-09 11:05:18
- * Copyright © Leedarson. All rights reserved.
- */
-
 import mqtt from 'mqtt';
-import logger from '@leedarson/logger';
-import { getSeq } from '@leedarson/helper';
-
-// TODO: 互踢
 class Mqtt {
   constructor() {
     this.client = null; // mqtt连接实例
