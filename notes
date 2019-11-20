@@ -4,3 +4,14 @@
 2.父组件调用子组件方法，  可以传入一个函数 返回值是 子组件的this
 
 3.存在当个input type=text 时  回车 会进行表单提交
+4.react setSate 的时候     
+const { selectDeviceData } = this.state;
+selectDeviceData[index].isSelect  = e.target.checked;
+直接修改state值   不会触发render  
+const { selectDeviceData } = this.state;
+let data = [
+  ...selectDeviceData
+]
+data[index].isSelect  = e.target.checked;
+
+复制出来一份新的再去改变  可以触发  （拷贝的问题，以及state的修改）
