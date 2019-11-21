@@ -15,3 +15,6 @@ let data = [
 data[index].isSelect  = e.target.checked;
 
 复制出来一份新的再去改变  可以触发  （拷贝的问题，以及state的修改）
+5. 决解组件卸载后还有setState 运行   this.setState = (state, callback) => {
+      return;
+   };
