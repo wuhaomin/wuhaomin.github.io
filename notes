@@ -18,3 +18,4 @@ data[index].isSelect  = e.target.checked;
 5. 决解组件卸载后还有setState 运行   this.setState = (state, callback) => {
       return;
    };
+6.创建一个自定义的环境变量，但是需要 REACT_APP _ 前缀。  process.env.REACT_APP_ENV = ”aa“ 用来打包
