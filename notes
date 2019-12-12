@@ -27,3 +27,5 @@ data[index].isSelect  = e.target.checked;
  color: var(--THEME-COLOR);
  document.documentElement.style.setProperty('--THEME-COLOR', value); //全局
  Element.setAttribute('style',value)  // 局部
+ 设置默认
+ background: var(--THEME-COLOR, #F00);
