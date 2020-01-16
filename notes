@@ -34,3 +34,13 @@ data[index].isSelect  = e.target.checked;
 
 9.对数组操作   拷贝  要进行push等操作要进行 深拷贝   JSON.parse(JSON.stringify({...LineChartDefault})) 
 10. 生成随机字符串  Math.random().toString(36).substr(2)   
+
+
+11.去除ant  点击蓝色边框
+      .ant-btn::after {
+        content: "";
+        background: none;
+        border: none;
+        animation: none;
+        opacity: 0;
+      }
