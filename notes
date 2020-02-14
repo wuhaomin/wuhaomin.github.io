@@ -44,3 +44,4 @@ data[index].isSelect  = e.target.checked;
         animation: none;
         opacity: 0;
       }
+12.能用链表时尽量使用，后期维护数据结构就行。
