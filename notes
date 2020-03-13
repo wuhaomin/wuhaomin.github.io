@@ -45,3 +45,41 @@ data[index].isSelect  = e.target.checked;
         opacity: 0;
       }
 12.能用链表时尽量使用，后期维护数据结构就行。
+13.写法对比
+
+const qsObj = qs(window.location.url)
+const urlType = qsObj.type
+// bad 
+if (urlType === 'wechat') {
+    doSomeThing()
+} else if () {
+    doSomeThing()
+} else if () {
+    doSomeThing()
+} else if () {
+    doSomeThing()
+}
+
+config.t
+const urlTypeConfig: Record<string, typeItem> = {
+  'wechat': { // key 就是对应的type
+    name: 'wechat', 
+    show: ['header', 'footer', 'wechat'] // 展示什么，可能是异步的
+    pession: ['admin'], // 权限是什么，可能是异步的
+  },
+  'zhifubao': { // key 就是对应的type
+    name: 'zhifubao', 
+    show: ['header', 'footer', 'zhifubao'] // 展示什么，可能是异步的
+    pession: ['admin'], // 权限是什么，可能是异步的
+  },
+}
+ 
+// 业务逻辑
+const qsObj = qs(window.location.url)
+const urlType = qsObj.type
+urlTypeConfig.forEach(item => {
+  if(urlType === item.type) {
+    doSomeThing(item.show)
+  }
+})
+
