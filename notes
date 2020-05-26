@@ -83,6 +83,6 @@ urlTypeConfig.forEach(item => {
   }
 })
 
-14.t.ds  ts中全局变量 interface Window {
+14.d.ts  ts中全局变量 interface Window {
     ResizeObserver: new (callback: (entries: any) => void) => any;
   }
