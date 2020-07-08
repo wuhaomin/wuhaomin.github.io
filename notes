@@ -86,3 +86,4 @@ urlTypeConfig.forEach(item => {
 14.d.ts  ts中全局变量 interface Window {
     ResizeObserver: new (callback: (entries: any) => void) => any;
   }
+15.ant  中表单  使用 setFieldsValue 的时候   在onChange 里面会失效     必须加上延迟=============
