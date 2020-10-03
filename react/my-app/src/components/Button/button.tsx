@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes, AnchorHTMLAttributes, FC } from 'react';
 import classNames from 'classnames';
+
 export enum ButtonSize {
 	large = 'lg',
 	Small = 'sm',
@@ -21,9 +22,21 @@ interface BaseButtonProps {
 	children: React.ReactNode;
 }
 
-const Button: React.FC<BaseButtonProps> = (props) => {
-	const { className, disabled, size, btnType, href, children } = props;
-	const classes = classNames('btn', {
+type NativeButtonProps = BaseButtonProps & ButtonHTMLAttributes<HTMLElement>;
+type AnchorButtonProps = BaseButtonProps & AnchorHTMLAttributes<HTMLElement>;
+
+export type ButtonProps = Partial<NativeButtonProps & AnchorButtonProps>;
+const Button: FC<ButtonProps> = (props) => {
+	const {
+		className,
+		disabled,
+		size,
+		btnType,
+		href,
+		children,
+		...restProps
+	} = props;
+	const classes = classNames('btn', className, {
 		[`btn-${btnType}`]: btnType,
 		[`btn-${size}`]: size,
 		disabled: btnType === ButtonType.Link && disabled,
@@ -31,14 +44,13 @@ const Button: React.FC<BaseButtonProps> = (props) => {
 
 	if (btnType === ButtonType.Link && href) {
 		return (
-			<a className={classes} href={href}>
+			<a {...restProps} className={classes} href={href}>
 				{children}
 			</a>
 		);
 	} else {
 		return (
-			<button className={classes} disabled={disabled}>
-				{' '}
+			<button {...restProps} className={classes} disabled={disabled}>
 				{children}
 			</button>
 		);

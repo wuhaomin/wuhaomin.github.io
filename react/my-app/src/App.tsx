@@ -8,7 +8,19 @@ function App() {
 	return (
 		<div className="App">
 			<header className="App-header">
-				<Button>ssss</Button>
+				<Button
+					onClick={() => console.log('sss')}
+					btnType={ButtonType.Danger}
+				>
+					ssss
+				</Button>
+				<Button disabled>ssss</Button>
+				<Button size={ButtonSize.large} btnType={ButtonType.Primary}>
+					aa
+				</Button>
+				<Button btnType={ButtonType.Link} href="#">
+					dfdd
+				</Button>
 				<p>
 					Edit <code>src/App.tsx</code> and save to reload.
 				</p>
