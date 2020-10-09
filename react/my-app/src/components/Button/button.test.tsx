@@ -1,24 +1,13 @@
 import React from 'react';
-import Button, { ButtonProps, ButtonType, ButtonSize } from './button';
-import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/user-event';
-import { render } from '@testing-library/react';
-// @testing-library/jest-dom
-import { fireEvent } from '@testing-library/dom';
-// fireEvent
-// test('Button test', () => {
-// 	const wrapper = render(<Button>wuhaomin</Button>);
-// 	const element = wrapper.queryByText('wuhaomin');
-// 	expect(element).toBeTruthy();
-// 	expect(element).toBeInTheDocument();
-// });
+import { render, fireEvent } from '@testing-library/react';
+import Button, { ButtonProps } from './button';
 const defaultProps = {
 	onClick: jest.fn(),
 };
 
 const testProps: ButtonProps = {
-	btnType: ButtonType.Primary,
-	size: ButtonSize.large,
+	btnType: 'primary',
+	size: 'lg',
 	className: 'klass',
 };
 
@@ -45,7 +34,7 @@ describe('test Button component', () => {
 	});
 	it('should render a link when btnType equals link and href is provided', () => {
 		const wrapper = render(
-			<Button btnType={ButtonType.Link} href="http://dummyurl">
+			<Button btnType="link" href="http://dummyurl">
 				Link
 			</Button>
 		);

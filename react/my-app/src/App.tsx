@@ -2,25 +2,13 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import './styles/index.scss';
-import Button, { ButtonType, ButtonSize } from './components/Button/button';
+import Button from './components/Button';
 
 function App() {
 	return (
 		<div className="App">
 			<header className="App-header">
-				<Button
-					onClick={() => console.log('sss')}
-					btnType={ButtonType.Danger}
-				>
-					ssss
-				</Button>
-				<Button disabled>ssss</Button>
-				<Button size={ButtonSize.large} btnType={ButtonType.Primary}>
-					aa
-				</Button>
-				<Button btnType={ButtonType.Link} href="#">
-					dfdd
-				</Button>
+				<Button btnType="default">5456416 </Button>
 				<p>
 					Edit <code>src/App.tsx</code> and save to reload.
 				</p>
