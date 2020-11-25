@@ -1,0 +1,43 @@
+import React from "react";
+import { render } from "react-dom";
+import { Stage, Layer, Image } from "react-konva";
+// gifler will be imported into global window object
+import "gifler";
+
+const GIF = ({ src }) => {
+  const imageRef = React.useRef(null);
+  const canvas = React.useMemo(() => {
+    const node = document.createElement("canvas");
+    return node;
+  }, []);
+
+  React.useEffect(() => {
+    // save animation instance to stop it on unmount
+    let anim;
+    window.gifler(src).get(a => {
+      anim = a;
+      anim.animateInCanvas(canvas);
+      anim.onDrawFrame = (ctx, frame) => {
+        ctx.drawImage(frame.buffer, frame.x, frame.y);
+        imageRef.current.getLayer().draw();
+      };
+    });
+    return () => anim.stop();
+  }, [src, canvas]);
+
+  return <Image image={canvas} ref={imageRef} />;
+};
+
+class App extends React.Component {
+  render() {
+    return (
+      <Stage width={window.innerWidth} height={window.innerHeight}>
+        <Layer>
+          <GIF src="https://konvajs.org/assets/yoda.gif" />
+        </Layer>
+      </Stage>
+    );
+  }
+}
+
+render(<App />, document.getElementById("root"));
